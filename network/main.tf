@@ -91,7 +91,7 @@ resource "aws_route_table" "ashfall_public_rt" {
   
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.ashfall_igw
+    gateway_id = aws_internet_gateway.ashfall_igw.id
   }
 
   tags = {
