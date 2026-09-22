@@ -77,3 +77,11 @@ resource "aws_subnet" "private_b" {
     Name = "ashfall-private-b"
   }
 }
+
+resource "aws_internet_gateway" "ashfall_igw" {
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "ashfall-igw"
+  }
+}
