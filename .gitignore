@@ -19,3 +19,7 @@ override.tf.json
 
 # Editor
 .vscode/
+
+# Python
+__pycache__/
+venv/
