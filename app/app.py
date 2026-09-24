@@ -46,3 +46,15 @@ def create_incident():
         "status" : incident.status, 
         "created_at" : incident.created_at.isoformat()
     }, 201
+
+@app.route ('/incidents', methods = ['GET'])
+def get_incidents():
+    incidents = Incident.query.all()
+    
+    return [{
+        "id" : incident.id,
+        "title" : incident.title,
+        "description" : incident.description, 
+        "status" : incident.status, 
+        "created_at" : incident.created_at.isoformat()
+    } for incident in incidents], 200
