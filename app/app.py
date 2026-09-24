@@ -8,6 +8,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get ('DATABASE_URL', 'sqlite:
 app.config['SQL_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+VALID_STATUSES = {'open', 'investigating', 'resolved'}
 
 @app.route('/health')
 def health():
@@ -32,6 +33,9 @@ def create_incident():
     if not data or 'title' not in data:
         return {'error': 'title is required'}, 400
     
+    if 'status' in data and data['status'] not in VALID_STATUSES:
+        return {'error': f"status must be one of {sorted(VALID_STATUSES)}"}, 400
+
     incident = Incident(
         title = data['title'],
         description = data.get('description'),
@@ -74,7 +78,7 @@ def update_incident(incident_id):
     if not data:
         return {'error': 'no data provided'}, 400
     
-    VALID_STATUSES = {'open', 'investigating', 'resolved'}
+    
     if 'status' in data and data['status'] not in VALID_STATUSES:
         return {'error': f"status must be one of {sorted(VALID_STATUSES)}"}, 400
 
