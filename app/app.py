@@ -99,3 +99,15 @@ def update_incident(incident_id):
         'created_at': incident.created_at.isoformat(),
         'updated_at': incident.updated_at.isoformat()
     }, 200
+    
+@app.route('/incidents/<int:incident_id>', methods=['DELETE'])
+def delete_incident(incident_id):
+    incident = Incident.query.get(incident_id)
+
+    if incident is None:
+        return {'error': 'incident not found'}, 404
+
+    db.session.delete(incident)
+    db.session.commit()
+
+    return '', 204
