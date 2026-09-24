@@ -21,6 +21,7 @@ class Incident(db.Model):
     description = db.Column(db.Text, nullable=True)
     status = db.Column(db.String(20), nullable=False, default='open')
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow) 
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     
 from flask import request
@@ -44,7 +45,8 @@ def create_incident():
         "title" : incident.title,
         "description" : incident.description, 
         "status" : incident.status, 
-        "created_at" : incident.created_at.isoformat()
+        "created_at" : incident.created_at.isoformat(),
+        "updated_at" : incident.updated_at.isoformat()
     }, 201
 
 @app.route ('/incidents', methods = ['GET'])
@@ -56,5 +58,40 @@ def get_incidents():
         "title" : incident.title,
         "description" : incident.description, 
         "status" : incident.status, 
-        "created_at" : incident.created_at.isoformat()
+        "created_at" : incident.created_at.isoformat(),
+        "updated_at" : incident.updated_at.isoformat()
     } for incident in incidents], 200
+    
+@app.route('/incidents/<int:incident_id>', methods=['PATCH'])
+def update_incident(incident_id):
+    incident = Incident.query.get(incident_id)
+
+    if incident is None:
+        return {'error': 'incident not found'}, 404
+
+    data = request.get_json()
+
+    if not data:
+        return {'error': 'no data provided'}, 400
+    
+    VALID_STATUSES = {'open', 'investigating', 'resolved'}
+    if 'status' in data and data['status'] not in VALID_STATUSES:
+        return {'error': f"status must be one of {sorted(VALID_STATUSES)}"}, 400
+
+    if 'title' in data:
+        incident.title = data['title']
+    if 'description' in data:
+        incident.description = data['description']
+    if 'status' in data:
+        incident.status = data['status']
+
+    db.session.commit()
+
+    return {
+        'id': incident.id,
+        'title': incident.title,
+        'description': incident.description,
+        'status': incident.status,
+        'created_at': incident.created_at.isoformat(),
+        'updated_at': incident.updated_at.isoformat()
+    }, 200
