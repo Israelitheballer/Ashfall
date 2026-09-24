@@ -24,4 +24,4 @@ override.tf.json
 __pycache__/
 venv/
 
-/instance
+instance/
