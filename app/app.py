@@ -5,9 +5,10 @@ import os
 from flask_sqlalchemy import SQLAlchemy
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get ('DATABASE_URL', 'sqlite:///app.db')
-app.config['SQL_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+
 VALID_STATUSES = {'open', 'investigating', 'resolved'}
 
 @app.route('/health')
@@ -23,6 +24,11 @@ class Incident(db.Model):
     status = db.Column(db.String(20), nullable=False, default='open')
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow) 
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+#create the db, or the db tables if they don't exist yet.
+with app.app_context():
+    db.create_all()
+    
     
     
 from flask import request
